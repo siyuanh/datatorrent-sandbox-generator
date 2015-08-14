@@ -43,5 +43,5 @@ All of the information around how your VM gets created is in the partner-sandbox
 
 ###Step 7 - Create the VM
 ```
-packer build --var 'mapr_version=3.1.1' --var 'partner_name=MyAppName' --var 'partner_version=7.0.1' partner-sandbox.json
+packer build -var 'distro_sandbox=\user\siyuan\downloads\MapR-Sandbox-For-Hadoop-4.1.0.ova'  -var 'dt_file=user\siyuan\downloads\datatorrent-rts-community-3.0.0.bin' partner-sandbox.json
 ```

@@ -1,39 +1,40 @@
 {
 	"variables":{
-		"mapr_version":"3.1.1",
-		"partner_name":"partner",
-		"partner_version":"7.0.1"
+		"distro_name":"MapR",
+		"distro_version":"4.1.0",
+		"distro_sandbox":"C:\\your\\hadoop\\sandbox\\MapR-Sandbox-For-Hadoop-4.1.0.ova",
+		"dt_version":"3.0.0",
+		"dt_file":"\\your\\dt\\installation\\file.bin"
 	},
 	"builders":[
 		{
-			"name":"partner",
-			"vm_name":"MapR-{{ user `partner_name` }}-{{ user `mapr_version` }}-{{ user `partner_version`}}",
+			"name":"datatorrent",
+			"vm_name":"datatorrent-{{ user `dt_version`}}-{{ user `distro_name`}}-{{ user `distro_version` }}",
 			"type":"virtualbox-ovf",
-			"source_path":"output-virtualbox-ovf/MapR-Sandbox-For-Hadoop-{{ user `mapr_version` }}_VB.ova",
+			"source_path":"{{ user `distro_sandbox` }}",
 			"ssh_username":"root",
 			"ssh_password":"mapr",
 			"ssh_wait_timeout":"300s",
 			"import_opts":"keepallmacs",
 			"shutdown_command":"shutdown -P now",
-			"format":"ova"
+			"format":"ova",
+			"vboxmanage": [
+				["modifyvm", "{{.Name}}", "--natpf1", "\"DTGateway,tcp,127.0.0.1,9090,,9090\""],
+				["modifyvm", "{{.Name}}", "--natpf1", "\"DTDashboard,tcp,127.0.0.1,3003,,3003\""]
+			]
 		}
 	],
 	"provisioners":[
 		{
 			"type":"file",
-			"source":"files/start_{{ user `partner_name` }}.sh",
-			"destination":"/opt/mapr/start_{{ user `partner_name` }}.sh"
-		},
-		{
-			"type":"file",
-			"source":"files/{{ user `partner_name` }}.rpm",
-			"destination":"/tmp/{{ user `partner_name` }}.rpm"
+			"source":"{{ user `dt_file` }}",
+			"destination":"/tmp/datatorrent.bin"
 		},
 		{
 			"type":"shell",
 			"execute_command":"bash '{{.Path}}'",
 			"scripts":[
-				"script/{{ user `partner_name` }}.sh"
+				"script/{{ user `distro_name` }}-install.sh"
 			]
 		}
 	]
