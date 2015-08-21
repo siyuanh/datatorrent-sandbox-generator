@@ -8,7 +8,7 @@
 	},
 	"builders":[
 		{
-			"name":"dt-sandbox",
+			"name":"dt-mapr-sandbox",
 			"vm_name":"datatorrent-{{ user `dt_version`}}-{{ user `distro_name`}}-{{ user `distro_version` }}",
 			"type":"virtualbox-ovf",
 			"source_path":"{{ user `distro_sandbox` }}",

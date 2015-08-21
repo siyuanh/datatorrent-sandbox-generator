@@ -39,7 +39,7 @@ def make_status_window():
     status_win.addstr(2,2,"To begin with datatorrent, Please go to http://%s:9090/#/docs" % ip)
     status_win.addstr(4,2,"You can access the host via SSH by %s" % (ssh_cmd))
     status_win.addstr(5,2,"The following credentials should be used for datatorrent - dtadmin/dtadmin")
-	status_win.addstr(7,2,"To begin with MapR, Please go to http://%s:8443/" % ip)
+    status_win.addstr(7,2,"To begin with MapR, Please go to http://%s:8443/" % ip)
 
 '''    if os.path.exists("/opt/mapr/hue"):
 	status_win.addstr(8,2,"The following credentials should be used for MCS & HUE - mapr/mapr")'''
