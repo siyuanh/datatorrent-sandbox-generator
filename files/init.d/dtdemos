@@ -1,0 +1,101 @@
+#!/bin/bash
+#
+# Manages DataTorrent Demo Applications Server
+# Author: Sasha Parfenov sasha@datatorrent.com
+#
+### BEGIN INIT INFO
+# Provides:             dtdemos
+# Required-Start:       $syslog $remote_fs
+# Required-Stop:        $syslog $remote_fs
+# Should-Start:         $local_fs
+# Should-Stop:          $local_fs
+# Default-Start:        2 3 4 5
+# Default-Stop:         0 1 6
+# Short-Description:    DTDemos
+# Description:          DataTorrent Demo Applications Server
+### END INIT INFO
+#
+# User to launch server
+SVC_USER=dtadmin
+# An application name to display in echo text.
+NAME="DataTorrent Demo Applications Server"
+# The full path to the directory containing the node and forever binaries.
+# NODE_BIN_DIR=/usr/bin
+# Set the NODE_PATH to the Node.js main node_modules directory.
+# NODE_PATH=/home/node/local/node/lib/node_modules
+APPLICATION=app.js
+APPLICATION_DIR=/opt/datatorrent/current/demos/ui
+# Process ID file path.
+PIDFILE=/var/run/datatorrent/dtdemos.pid
+PIDDIR=/var/run/datatorrent
+# Log file path.
+LOGFILE=/var/log/datatorrent/dtdemos.log
+
+# Demo UI environment variables
+app_env=$( cat <<EOF
+#export MACHINE_REDIS_HOST=localhost
+#export ADS_REDIS_HOST=localhost
+export PORT=3003
+export GATEWAY_HOST=localhost
+export GATEWAY_PORT=9090
+export APP_NAME_ADS="AdsDimensionsDemo"
+#export APP_NAME_FRAUD="FraudDetectDemo"
+#export APP_NAME_MACHINE="MachineDataDemo"
+export APP_NAME_MOBILE="MobileDemo"
+export APP_NAME_TWITTER="TwitterDemo"
+EOF
+)
+
+# PATH=$NODE_BIN_DIR:$PATH
+# export NODE_PATH=$NODE_PATH
+[ -d "$PIDDIR" ] || install -d -m 0755 -o $SVC_USER "$PIDDIR" 1>/dev/null 2>&1 || :
+
+start() {
+    echo "Starting $NAME"
+    # The minUptime and spinSleepTime settings stop Forever from thrashing if the application fails immediately on launch.
+    su -l $SVC_USER -c "${app_env}; cd ${APPLICATION_DIR} && forever start -p $PIDDIR --pidFile $PIDFILE -a -l $LOGFILE --minUptime 5000 --spinSleepTime 2000 ${APPLICATION_DIR}/${APPLICATION}"
+    RETVAL=$?
+}
+
+stop() {
+    su -l $SVC_USER -c "${app_env}; cd ${APPLICATION_DIR} && forever stop -p $PIDDIR ${APPLICATION_DIR}/${APPLICATION}"
+    RETVAL=$?
+    if [ -f "$PIDFILE" ]; then
+        echo "Killing PID `cat $PIDFILE`"
+        kill -9 `cat $PIDFILE`
+        rm -f "$PIDFILE"
+        RETVAL=0
+    fi
+}
+
+restart() {
+    echo "Restarting $NAME"
+    stop
+    start
+}
+
+status() {
+    echo "Status for $NAME:"
+    su -l $SVC_USER -c "${app_env}; forever list -p $PIDDIR"
+    RETVAL=$?
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        status
+        ;;
+    restart)
+        restart
+        ;;
+    *)
+        echo "Usage: {start|stop|status|restart}"
+        exit 1
+        ;;
+esac
+exit $RETVAL

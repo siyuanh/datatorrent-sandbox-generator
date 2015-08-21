@@ -30,7 +30,7 @@ MapR - http://package.mapr.com/releases/
 ###Step 4 - Download the datatorrent installation file
 https://www.datatorrent.com/download/
 
-###Step 7 - Create the VM
+###Step 5 - Create the VM
 ```
 packer build -var 'distro_sandbox=\your\hadoop\distro\MapR-Sandbox-For-Hadoop-4.1.0.ova'  -var 'dt_file=your\datatorrent\release\datatorrent-rts-community-3.0.0.bin' partner-sandbox.json
 ```

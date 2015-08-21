@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!-- Put this in $HOME/.dt/dt-site.xml -->
+<configuration>
+  <property>
+     <name>dt.attr.MASTER_MEMORY_MB</name>
+     <value>1024</value>
+  </property>
+  <property>
+     <name>dt.attr.HEARTBEAT_TIMEOUT_MILLIS</name>
+     <value>300000</value>
+  </property>
+  <property>
+    <name>dt.attr.GATEWAY_CONNECT_ADDRESS</name>
+    <value>127.0.0.1:9090</value>
+    <description>Automatically set by DTGateway</description>
+  </property>
+  <property>
+    <name>dt.gateway.listenAddress</name>
+    <value>0.0.0.0:9090</value>
+  </property>
+  <property>
+    <name>dt.gateway.http.authentication.type</name>
+    <value>password</value>
+  </property>
+
+
+
+  <!-- Sandbox Settings For Sales Demo -->
+  <property>
+    <name>dt.application.SalesDemo.operator.DimensionsComputation.attr.PARTITIONER</name>
+    <value>com.datatorrent.common.partitioner.StatelessPartitioner:1</value>
+  </property>
+  <property>
+    <name>dt.application.SalesDemo.operator.InputGenerator.maxTuplesPerWindow</name>
+    <value>100</value>
+  </property>
+  <property>
+    <name>dt.application.SalesDemo.operator.InputGenerator.tuplesPerWindowDeviation</name>
+    <value>10</value>
+  </property>
+  <property>
+    <name>dt.application.SalesDemo.operator.Query.attr.MEMORY_MB</name>
+    <value>256</value>
+  </property>
+  <property>
+    <name>dt.application.SalesDemo.operator.QueryResult.attr.MEMORY_MB</name>
+    <value>256</value>
+  </property>
+  <property>
+    <name>dt.application.SalesDemo.operator.Store.attr.MEMORY_MB</name>
+    <value>512</value>
+  </property>
+  <property>
+    <name>dt.application.SalesDemo.operator.InputGenerator.attr.MEMORY_MB</name>
+    <value>128</value>
+  </property>
+  <property>
+    <name>dt.application.SalesDemo.operator.Converter.attr.MEMORY_MB</name>
+    <value>128</value>
+  </property>
+  <property>
+    <name>dt.application.SalesDemo.operator.DimensionsComputation.attr.MEMORY_MB</name>
+    <value>128</value>
+  </property>
+  <property>
+    <name>dt.application.SalesDemo.operator.Enrichment.attr.MEMORY_MB</name>
+    <value>128</value>
+  </property>
+
+  <!-- Mobile Demo Settings for Sandbox -->
+  <property>
+    <name>dt.application.MobileDemo.operator.*.attr.MEMORY_MB</name>
+    <value>768</value>
+  </property>
+  <property>
+    <name>dt.application.MobileDemo.operator.*.attr.JVM_OPTIONS</name>
+    <value>-Xmx128m</value>
+  </property>
+  <property>
+    <name>dt.application.MobileDemo.operator.*.port.*.attr.BUFFER_MEMORY_MB</name>
+    <value>256</value>
+  </property>
+
+</configuration>
