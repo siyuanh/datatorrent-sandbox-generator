@@ -2,11 +2,14 @@
 
 ###############  Install and config datatorrent  ###########################
 #install datatorrent
-sh /tmp/datatorrent.bin -s /tmp/dt-site.xml
+sh /tmp/dt/datatorrent.bin -s /tmp/dt/dt-site.xml
+
+chown -R dtadmin /tmp/dt
 
 #create hdfs root directory
-hadoop fs -mkdir -p /user/dtadmin/datatorrent
+hadoop fs -mkdir -p /user/dtadmin
 hadoop fs -chown -R dtadmin /user/dtadmin
+
 
 
 #Add datatorrent to welcome.py script
@@ -14,34 +17,56 @@ hadoop fs -chown -R dtadmin /user/dtadmin
 #    status_win.addstr(3,2,"Please go to http://%s:9090/static/#/docs/welcome.md to begin with your datatorrent experience!(user/pass:dtadmin/dtamin)" % ip)' /opt/startup/welcome.py
 
 
-curl -c /tmp/cookie-jar -XPOST -H "Content-Type: application/json" \
+curl -c /tmp/dt/cookie-jar -XPOST -H "Content-Type: application/json" \
 -d '{"userName":"dtadmin","password":"dtadmin"}' \
 http://localhost:9090/ws/v2/login
 
 #config datatorrent
-curl -b /tmp/cookie-jar -H "Content-Type: application/json" \
+curl -b /tmp/dt/cookie-jar -H "Content-Type: application/json" \
 -X PuT -d '{name:"dt.dfsRootDirectory", value:"/user/dtadmin/datatorrent"}' \
 http://localhost:9090/ws/v2/config/properties/dt.dfsRootDirectory
 
 #config license
-mv /tmp/sandbox_license /opt/datatorrent/current/sandbox_license
-curl -b /tmp/cookie-jar -H "Content-Type: application/json" \
+mv /tmp/dt/sandbox_license /opt/datatorrent/current/sandbox_license
+curl -b /tmp/dt/cookie-jar -H "Content-Type: application/json" \
 -X PuT -d '{name:"dt.license.file", value:"/opt/datatorrent/current/sandbox_license"}' \
 http://localhost:9090/ws/v2/config/properties/dt.license.file
 
+
+#dtcli -vvvv -e "get-app-package-info /opt/datatorrent/releases/3.0.0/demos/pi-demo-3.0.0.apa" > /tmp/dt/a.log
+
 #finish configuration
-curl -b /tmp/cookie-jar -H "Content-Type: application/json" \
+curl -b /tmp/dt/cookie-jar -H "Content-Type: application/json" \
 -X PuT -d '{name:"dt.configStatus", value:"complete"}' \
 http://localhost:9090/ws/v2/config/properties/dt.configStatus
 
-sleep 10s
+
+#import default demos
+pkgs=("pi-demo" "mobile-demo" "twitter-demo")
+for pkg in "${pkgs[@]}"
+do
+  hadoop fs -mkdir -p "/user/dtadmin/datatorrent/appPackages/dtadmin/$pkg/$1/"
+  hadoop fs -copyFromLocal "/opt/datatorrent/current/demos/$pkg-$1.apa" "/user/dtadmin/datatorrent/appPackages/dtadmin/$pkg/$1/appPackage.zip"
+  echo `dtcli -e "get-app-package-info /opt/datatorrent/releases/$1/demos/$pkg-$1.apa"` > "/tmp/dt/$pkg.json"
+  hadoop fs -copyFromLocal "/tmp/dt/$pkg.json" "/user/dtadmin/datatorrent/appPackages/dtadmin/$pkg/$1/appPackage.json"
+done
+
+hadoop fs -chown -R dtadmin /user/dtadmin
 
 #import demos for sandbox
-curl -b /tmp/cookie-jar -H "Content-Type: application/json" \
--XPOST -d '{files: ["pi-demo-3.0.0.apa", "twitter-demo-3.0.0.apa", "mobile-demo-3.0.0.apa"]}' \
-http://localhost:9090/ws/v2/appPackages/import
+#curl -b /tmp/dt/cookie-jar -H "Content-Type: application/json" \
+#-XPOST -d '{files: ["pi-demo-3.0.0.apa", "twitter-demo-3.0.0.apa", "mobile-demo-3.0.0.apa"]}' \
+#http://localhost:9090/ws/v2/appPackages/import
 
-mv /tmp/ui /opt/datatorrent/current/demos/ui
+
+#sleep 15s
+
+#import demos for sandbox
+#curl -b /tmp/dt/cookie-jar -H "Content-Type: application/json" \
+#-XPOST -d '{files: ["pi-demo-3.0.0.apa", "twitter-demo-3.0.0.apa", "mobile-demo-3.0.0.apa"]}' \
+#http://localhost:9090/ws/v2/appPackages/import
+
+mv /tmp/dt/ui /opt/datatorrent/current/demos/ui
 
 cd /opt/datatorrent/current/demos/ui
 sh install.sh
@@ -54,3 +79,4 @@ chkconfig --level 234 dtdemos on
 
 
 #TODO clean up the files
+rm -rf /tmp/dt

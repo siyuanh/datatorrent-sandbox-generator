@@ -29,7 +29,7 @@ def make_welcome_window():
     welcome_win = screen.subwin(Height / 2 - Width_Factor - 2, Width, 0, 0)
     welcome_win.box()
     welcome_win.addstr(1,2,"=== Datatorrent-Sandbox-On-MapR ===", curses.A_BOLD)
-    welcome_win.addstr(3,2,"Version: 4.1.0")
+    welcome_win.addstr(3,2,"MapR Version: $distro_version, DT Version: $dt_version")
 
 def make_status_window():
     Height, Width = screen.getmaxyx()

@@ -15,9 +15,16 @@ do
 done
 
 #reduce the preserved heapsize used by file server
-sed -i 's/service.command.mfs.heapsize.percent/service.command.mfs.heapsize.percent=15/' /opt/mapr/conf/warden.conf
+sed -i 's/service.command.mfs.heapsize.percent/service.command.mfs.heapsize.percent=20/' /opt/mapr/conf/warden.conf
+
+
+distro_version=$1
+dt_version=$2
+sed -i "s/\$distro_version/$distro_version/g;s/\$dt_version/$dt_version/g" /opt/startup/welcome.py
 
 #install nodejs dependencies for demo ui
 curl -sL https://rpm.nodesource.com/setup | bash
 yum install -y nodejs dos2unix
 npm install forever -g
+
+mkdir /tmp/dt

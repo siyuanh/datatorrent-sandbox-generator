@@ -8,8 +8,8 @@
 	},
 	"builders":[
 		{
-			"name":"dt-mapr-sandbox",
-			"vm_name":"datatorrent-{{ user `dt_version`}}-{{ user `distro_name`}}-{{ user `distro_version` }}",
+			"name":"uploaddt-{{ user `dt_version`}}-mapr-{{ user `distro_version`}}-sandbox",
+			"vm_name":"uploaddatatorrent-{{ user `dt_version`}}-{{ user `distro_name`}}-{{ user `distro_version` }}",
 			"type":"virtualbox-ovf",
 			"source_path":"{{ user `distro_sandbox` }}",
 			"ssh_username":"root",
@@ -21,26 +21,11 @@
 			"vboxmanage": [
 				["modifyvm", "{{.Name}}", "--memory", "10240"],
 				["modifyvm", "{{.Name}}", "--natpf1", "\"DTGateway,tcp,127.0.0.1,9090,,9090\""],
-				["modifyvm", "{{.Name}}", "--natpf1", "\"DTDashboard,tcp,127.0.0.1,3003,,3003\""]
+				["modifyvm", "{{.Name}}", "--natpf1", "\"DTDemo,tcp,127.0.0.1,3003,,3003\""]
 			]
 		}
 	],
 	"provisioners":[
-		{
-			"type":"file",
-			"source":"{{ user `dt_file` }}",
-			"destination":"/tmp/datatorrent.bin"
-		},
-		{
-			"type":"file",
-			"source":"files/sandbox_license",
-			"destination":"/tmp/sandbox_license"
-		},
-		{
-			"type":"file",
-			"source":"files/dt-site.xml",
-			"destination":"/tmp/dt-site.xml"
-		},
 		{
 			"type":"file",
 			"source":"files/welcome.py",
@@ -48,14 +33,30 @@
 		},
 		{
 			"type":"shell",
-			"execute_command":"bash '{{.Path}}'",
+			"execute_command":"bash '{{.Path}}' {{ user `distro_version` }} {{ user `dt_version`}}",
 			"scripts":[
 				"script/{{ user `distro_name` }}-install.sh"
 			]
-		},{
+		},
+		{
+			"type":"file",
+			"source":"{{ user `dt_file` }}",
+			"destination":"/tmp/dt/datatorrent.bin"
+		},
+		{
+			"type":"file",
+			"source":"files/sandbox_license",
+			"destination":"/tmp/dt/sandbox_license"
+		},
+		{
+			"type":"file",
+			"source":"files/dt-site.xml",
+			"destination":"/tmp/dt/dt-site.xml"
+		},
+		{
 			"type":"file",
 			"source":"files/ui",
-			"destination":"/tmp/"
+			"destination":"/tmp/dt"
 		},
 		{
 			"type":"file",
@@ -69,10 +70,9 @@
 		},
 		{
 			"type":"shell",
-			"execute_command":"bash '{{.Path}}'",
-			"scripts":[
-				"script/dt-install.sh"
-			]
+			"execute_command":"sh '{{.Path}}' {{ user `dt_version`}}",
+			"script":"script/dt-install.sh"
 		}
+
 	]
 }
